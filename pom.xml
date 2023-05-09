@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	
 	<groupId>com.mt</groupId>
-	<artifactId>maven-web-app</artifactId>
+	<artifactId>maven-web-application</artifactId>
 	<packaging>war</packaging>
 	<version>2.0-RELEASE</version>
 	
@@ -104,7 +104,7 @@
 	    <snapshotRepository>
 	      <id>nexus</id>
 	      <name>Mithun Technologies Snapshot Nexus Repository </name>
-	      <url>http://3.144.203.151:8081/govardhan/repository/maven-hosted-repo-release/</url>
+	      <url>http://3.144.203.151:8081/govardhan/repository/maven-hosted-repo-snapshot</url>
 	    </snapshotRepository>
 	    
 	</distributionManagement>
