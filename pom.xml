@@ -110,7 +110,7 @@
 	</distributionManagement>
 	
 	<build>
-		<finalName>maven-web-application</finalName>
+		<finalName>Govardhan Technologies</finalName>
 		
 		<plugins>
 			<plugin>
