@@ -110,7 +110,7 @@
 	</distributionManagement>
 	
 	<build>
-		<finalName>Govardhan Technologies</finalName>
+		<finalName>Govardhan-Technologies</finalName>
 		
 		<plugins>
 			<plugin>
