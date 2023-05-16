@@ -1,0 +1,62 @@
+pipeline{
+agent any
+tools{
+maven "maven_software"
+
+}
+//Getting the code from github
+stages{
+    stage ('CheckoutCode'){
+	steps{
+	
+	git credentialsId: 'Github_repo', url: 'https://github.com/HarshaVenkatTechnologies/maven-web-application.git'
+	}
+	
+	
+	
+	}
+	// This will build the war file
+	
+	stage('Build'){
+	steps{
+	sh "mvn clean package" 
+	
+	}
+	}
+	
+//Executing sonar qube report
+stage('Execute sonarqube report'){
+    steps{
+        sh "mvn clean package"
+    }
+}
+// This will execute the shell script
+stage('shell script'){
+    steps{
+        sh "echo 'Hello This is declarative pipeline'"
+    }
+}
+// This will generate the Build number
+stage('Build_name'){
+    steps{
+      echo "The build number is: ${env.BUILD_NUMBER}"
+    }
+}
+// This step is for to uploading the artifact to nexus server
+stage('uploading artifactory'){
+    steps{
+        sh "mvn clean deploy"
+    }
+}
+// This is for tomcat server
+stage('deploying artifact to the application server'){
+    steps{
+        sshagent(['67f17b7b-d810-4497-a895-d66a8cff52b9']) {
+   sh "scp -o StrictHostKeyChecking=no /var/lib/jenkins/workspace/Jenkins_pipeline/target/Govardhan-Technologies.war ec2-user@3.136.19.22:/opt/tomcat9/webapps/"
+}
+
+    }
+}
+}// stage closing
+
+}// pipeline closing
