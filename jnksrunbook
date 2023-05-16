@@ -1,0 +1,214 @@
+Continuous integration
+Continuous delivery
+continuous deployment
+
+
+if we see any error like "Public key for jenkins-2.387.2-1.1.noarch.rpm is not installed"we can follow the steps
+
+sudo vi /etc/yum.repos.d/jenkins.repo
+[generic]
+name=Jenkins-stable
+baseurl=https://pkg.jenkins.io/redhat-stable/
+gpgcheck=0
+
+set gpgcheck=1 to 0
+
+2004 (Hudson) released 
+
+
+2012
+
+
+
+CI : (continous integration is tha process of automating the build and testing the code when developer push the code or source code management )
+#####
+
+process of creating a package
+CI benefits
+##############
+
+1. immediate bug detection
+
+
+CI : 
+
+CI is the process of automating the build and testing the code when developer push the code to the SCM
+
+
+to deploy ear files we should use jfrogg server or wildfly
+
+
+Continuous Delivery --> is a manul process (deployment) (Production) (External project)
+Continuous deployment --> Automation process (Internal Projects)
+
+
+Continuous Delivery --> will be used for external projects
+Continous Deployment --> will be used for internal projects
+
+
+Dev Env--> QA --> Prod
+
+Java code coverage
+
+Jacoco --> Java code coverage (it's going to test the unit test cases)
+
+
+Jenkins we have some option to customize the threshold for code coverage to not to deploy when threshold not reached
+
+
+
+
+Plugin :
+   piece of softare,which will add feature to the jenkins
+1800 + are avaiable
+
+we can follow the using CI, CD 
+we can notify to the stakeholders through the emails or slack notifications
+
+Jenkins we can create a jira ticket
+
+
+if we download any plugin that's going to download from jenkins plugin repository
+
+
+
+-----> jenkins default port number is 8080
+
+
+
+
+----> if we get error like failed to connect to the repository that means git is not installed in the jenkins server 
+
+
+
+-->
+  freestyle
+  --> we need to install git in jenkins server 
+				--> sudo yum install git -y 
+  --> we need to install maven in jenkins UI
+     1. manager Jenkins --> Global tool configuration there we can add maven version is 3.9.1
+	 
+	 
+  Jenkins Home directory
+-------------------------
+ --> /var/lib/jenkins 
+      source code will get store under /var/lib/jenkins/workspace
+	  
+	 
+if we install any tools those will be stored under 
+  --> /var/lib/jenkins/tools/
+
+  we should install deploy to container for tomcat 
+  we should mention war file in jenkins under 
+
+post build section like below
+
+-- > **/maven-web-application.war  
+	 to deoloy to tomcat we should follow below steps
+	--> we need to add the manager-script in tomcat/tomcat-users.xml 
+	 <user username="govardhan" password="password" roles="manager-gui,admin-gui,manager-script" />
+	 
+	 
+	 There are 3 ways to automate the job when developer push the code
+	 1 . Poll SCM
+	 2. Build periodically
+	 3. Github Webhook
+ It's going to check the revision (commit id) to trigger new job
+
+
+
+
+--> When we use bill periodically it will trigger the build as per the schedule time
+--> Poll scm will work when there is change in git
+--> process to configure webhook
+   http://3.17.180.243:8080/github-webhook/ this is the context path 
+   we should add above URL in github repository in settings tab below are the options 
+   --> application/json
+   --> just push the event
+    
+
+--> Delete workspace begore it starts a build 
+
+  -- option under build environment
+ Jacoco plugin for code coverage 
+
+diffrence between jacoco and sonarqube is that 
+--> we can stop deploying by using jacoco when it's not reaching to the threshold 
+--> in sonarqube it's not possible
+
+many companies are using declarative pipeline
+ 
+	 SLACK INTEGRATION
+	 ######################
+	 
+-- Need to download plugin called "slack notification"
+-- in slack need to select settings& administration we can add the slackintegration 
+
+
+JENKINS DIRECTORY STRUCTURE : 
+#############################
+
+
+Default Home Directory : /var/lib/jenkins
+#######################################
+Jobs -- it container's the job's information
+
+
+in jenkins also there is a one context.xml (that contain's job configuration)
+
+--> workspacecontainer's source code
+
+what is plugin?
+
+plugin is a piece of software which addes extra features to the jenkins 
+
+
+tools :
+#######
+
+the softares which we add from globl tool configuration those will get save here
+
+
+plugin extension
+##################
+.jpi
+ 
+ 
+ if we forgot jenkins password steps to recovery
+ 
+ we can go to the 
+ 
+ 
+ cd jobs/projectname
+     under this we can find file called config.xml
+	 there we can change security properity true to false then we can restart the server 
+	 
+	 
+	 maven integration plugin --> we can create only for maven project's java
+	 
+ one more way to restart the jenkins server
+ http://3.17.180.243:8080/restart --> it will restart forcufully 
+ http://3.17.180.243:8080/SafeRestart --> it will restart saferly
+ 
+--> webshere App server --> we can use urban code deploy
+--> Audit trail plugin
+--> job config history plugin to restore the deleted project's 
+--> schedule build 
+-->  Build number description seter "we can modify the build details with ENV and description" (custome name along with build number)
+--> Build with parameter
+ */${BranchName}
+ 
+ 
+ ################################################
+ 
+ manage the jenkins access
+ 
+ we should we create a user's from 
+    --> manage users 
+	
+	then we can modify the required access from --> configure global security 
+	
+	
+#########################################################
+
+--> How to take a back up
