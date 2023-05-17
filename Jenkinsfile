@@ -2,7 +2,7 @@ node
 {
 def mavenHome = tool name: "maven_software"
 properties([buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '5', numToKeepStr: '10')), [$class: 'JobLocalConfiguration', changeReasonComment: ''], pipelineTriggers([pollSCM('* * * * *')])])
-
+//added some lines in jenkins UI
 
 echo "The Job name is: ${env.JOB_NAME}"
 echo "The node name is: ${env.NODE_NAME}"
