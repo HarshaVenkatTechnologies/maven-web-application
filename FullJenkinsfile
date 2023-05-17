@@ -1,13 +1,16 @@
 pipeline{
 agent any
-//This is for pollsmc
+
+parameters {
+  choice choices: ['master', 'development'], description: 'This is choice parameter', name: 'Branch'
+}
+
 triggers {
   pollSCM '* * * * *'
 }
-// This is for to get the time stamp in console output and discard old builds options
 options {
   timestamps()
-  buildDiscarder logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '10', numToKeepStr: '10')
+  buildDiscarder logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '10', numToKeepStr: '5')
 }
 
 tools{
