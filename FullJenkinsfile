@@ -1,0 +1,116 @@
+pipeline{
+agent any
+//This is for pollsmc
+triggers {
+  pollSCM '* * * * *'
+}
+// This is for to get the time stamp in console output and discard old builds options
+options {
+  timestamps()
+  buildDiscarder logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '10', numToKeepStr: '10')
+}
+
+tools{
+maven "maven_software"
+
+}
+//Getting the code from github
+stages{
+    stage ('CheckoutCode'){
+	steps{
+	
+	git credentialsId: 'Github_repo', url: 'https://github.com/HarshaVenkatTechnologies/maven-web-application.git'
+	}
+	
+	
+	
+	}
+	// This will build the war file
+	
+	stage('Build'){
+	steps{
+	sh "mvn clean package" 
+	
+	}
+	}
+	
+//Executing sonar qube report
+stage('Execute sonarqube report'){
+    steps{
+        sh "mvn clean package"
+    }
+}
+// This will execute the shell script
+stage('shell script'){
+    steps{
+        sh "echo 'Hello This is declarative pipeline'"
+    }
+}
+// This will generate the Build number
+stage('Build_name'){
+    steps{
+      echo "The build number is: ${env.BUILD_NUMBER}"
+    }
+}
+// This step is for to uploading the artifact to nexus server
+stage('uploading artifactory'){
+    steps{
+        sh "mvn clean deploy"
+    }
+}
+// This is for tomcat server
+stage('deploying artifact to the application server'){
+    steps{
+        sshagent(['67f17b7b-d810-4497-a895-d66a8cff52b9']) {
+   sh "scp -o StrictHostKeyChecking=no /var/lib/jenkins/workspace/Jenkins_pipeline/target/Govardhan-Technologies.war ec2-user@3.136.19.22:/opt/tomcat9/webapps/"
+}
+
+    }
+}
+}// stage closing
+post {
+  success {
+      notifySlack(currentBuild.result)
+    // One or more steps need to be included within each condition's block.
+  }
+  failure {
+      notifySlack(currentBuild.result)
+    // One or more steps need to be included within each condition's block.
+  }
+}
+
+}// pipeline closing
+
+def notifySlack(String buildStatus = 'STARTED') {
+    
+    buildStatus = buildStatus ?: 'SUCCESS'
+
+    def color
+
+    if (buildStatus == 'STARTED') {
+        color = '#D4DADF'
+    } else if (buildStatus == 'SUCCESS') {
+        color = '#BDFFC3'
+    } else if (buildStatus == 'UNSTABLE') {
+        color = '#FFFE89'
+    } else {
+        color = '#FF9FA1'
+    }
+
+    def msg = "${buildStatus}: `${env.JOB_NAME}` #${env.BUILD_NUMBER}:\n${env.BUILD_URL}"
+
+    slackSend(color: color, message: msg)
+}
+
+node {
+    try {
+        notifySlack()
+
+        // Existing build steps.
+    } catch (e) {
+        currentBuild.result = 'FAILURE'
+        throw e
+    } finally {
+        notifySlack(currentBuild.result)
+    }
+}
