@@ -1,5 +1,18 @@
 pipeline{
 agent any
+
+parameters {
+  choice choices: ['master', 'development'], description: 'This is choice parameter', name: 'Branch'
+}
+
+triggers {
+  pollSCM '* * * * *'
+}
+options {
+  timestamps()
+  buildDiscarder logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '10', numToKeepStr: '5')
+}
+
 tools{
 maven "maven_software"
 
