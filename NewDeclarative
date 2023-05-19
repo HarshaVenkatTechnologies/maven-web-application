@@ -1,0 +1,121 @@
+pipeline {
+  agent {
+    label 'nodeone'
+  }
+
+  parameters {
+    choice choices: ['master', 'development'], description: 'This is choice parameter', name: 'Branch'
+  }
+
+  triggers {
+    pollSCM '* * * * *'
+  }
+
+  options {
+    timestamps()
+    buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '10', numToKeepStr: '5'))
+  }
+
+  tools {
+    maven "maven_software"
+  }
+
+  stages {
+    stage('CheckoutCode') {
+      steps {
+        git credentialsId: 'Github_repo', url: 'https://github.com/HarshaVenkatTechnologies/maven-web-application.git'
+      }
+    }
+
+    stage('Build') {
+      steps {
+        sh "mvn clean package"
+      }
+    }
+
+    stage('Execute sonarqube report') {
+      steps {
+        sh "mvn clean package"
+      }
+    }
+
+    stage('shell script') {
+      steps {
+        sh "echo 'Hello This is declarative pipeline'"
+      }
+    }
+
+    stage('Build_name') {
+      steps {
+        echo "The build number is: ${env.BUILD_NUMBER}"
+      }
+    }
+
+    stage('uploading artifactory') {
+      steps {
+        sh "mvn clean deploy"
+      }
+    }
+
+    stage('Deploy') {
+      steps {
+        script {
+          // Check if the .war file exists
+          def warFile = new File('/opt/tomcat9/webapps/Govardhan-Technologies.war')
+          def warExists = warFile.exists()
+          
+          // Conditionally overwrite the existing .war file
+          if (warExists) {
+            sh "rm ${warFile}"
+          }
+          
+          // Copy the new .war file to the application server
+          sshagent(['67f17b7b-d810-4497-a895-d66a8cff52b9']) {
+            sh "scp -o StrictHostKeyChecking=no /home/ec2-user/nodeone/workspace/Jenkins_declarative/target/Govardhan-Technologies.war ec2-user@3.136.19.22:/opt/tomcat9/webapps/"
+          }
+        }
+      }
+    }
+  }
+
+  post {
+    success {
+      notifySlack(currentBuild.result)
+    }
+    failure {
+      notifySlack(currentBuild.result)
+    }
+  }
+}
+
+def notifySlack(String buildStatus = 'STARTED') {
+  buildStatus = buildStatus ?: 'SUCCESS'
+
+  def color
+
+  if (buildStatus == 'STARTED') {
+    color = '#D4DADF'
+  } else if (buildStatus == 'SUCCESS') {
+    color = '#BDFFC3'
+  } else if (buildStatus == 'UNSTABLE') {
+    color = '#FFFE89'
+  } else {
+    color = '#FF9FA1'
+  }
+
+  def msg = "${buildStatus}: `${env.JOB_NAME}` #${env.BUILD_NUMBER}:\n${env.BUILD_URL}"
+
+  slackSend(color: color, message: msg)
+}
+
+node {
+  try {
+    notifySlack()
+    // Existing build steps.
+  } catch (e) {
+    currentBuild.result = 'FAILURE'
+    throw e
+  } finally {
+    notifySlack(currentBuild.result)
+  }
+}
