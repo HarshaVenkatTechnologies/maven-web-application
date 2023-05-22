@@ -1,0 +1,28 @@
+//Checkout the code
+node ('built-in') {
+
+stage ('checkout the code') {
+git credentialsId: 'Github_repo', url: 'https://github.com/Harsha-venkat/nodejs-app-mss.git'
+}
+
+//it will generate the package .json package
+stage('build the application'){
+nodejs(nodeJSInstallationName: 'nodejs20.2.0'){
+sh "npm install"
+}
+}
+stage('generating sonar report'){
+    nodejs(nodeJSInstallationName: 'nodejs20.2.0'){
+      sh "npm run sonar"
+    }
+}
+
+stage ('Upload artifacts into a nexus'){
+    sh "npm publish"
+}
+
+stage ('RunNodeJsApp'){
+    sh "npm start &"
+}
+
+}
