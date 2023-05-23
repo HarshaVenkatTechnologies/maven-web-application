@@ -1,0 +1,29 @@
+@Library('sharedlib')_
+
+pipeline {
+    agent none
+
+    stages {
+        stage('Hello') {
+            steps {
+                echo 'Hello World'
+            }
+        }
+    }
+    
+    post{
+        success{
+            sendSlackNotifications('currentBuild.result')
+            
+        }
+        failure{
+                sendSlackNotifications('currentBuild.result')
+            }
+        
+        
+        
+        
+    }
+    
+    
+}
